@@ -40,7 +40,7 @@ function setup() {
 function draw() {
   // noFill()
   // background(220);
-  image(skyImage, 0, 0, width, height)
+  image(skyImage, 0, 0, width, height  )
   bird.show()
   bird.update()
   if(pipes.length > 0){
@@ -154,6 +154,12 @@ function draw() {
 
 
 function keyPressed(){
+  if(key = ' '){
+    bird.lift();
+  }
+}
+
+function mousePressed(){
   if(key = ' '){
     bird.lift();
   }
