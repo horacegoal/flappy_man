@@ -12,21 +12,25 @@ let birdImage;
 let pipeImage1;
 let pipeImage2;
 let ballImage;
+let skyImage;
+let canvas;
 
 function preload() {
   birdImage = loadImage('../image/bird.png');
   pipeImage1 = loadImage('../image/pipe.png');
   pipeImage2 = loadImage('../image/pipe_inverse.png');
   ballImage = loadImage('../image/ball.png')
+  skyImage = loadImage('../image/sky.jpg');
 }
 
 function setup() {
-  createCanvas(400, 600);
+  canvas = createCanvas(400, 600);
+  canvas.id('gameCanvas');
   bird = new Bird(birdImage);
   scoreItem = createP(`Score : ${bird.count}`)
   pipes = [];
-  dice = random(1)
-  if(dice < 0.7){
+  dice = floor(random(10)) + 1;
+  if(dice <= 7){
     pushPipe = true;
   }else{
     pushPipeSequence = true;
@@ -35,7 +39,8 @@ function setup() {
 
 function draw() {
   // noFill()
-  background(220);
+  // background(220);
+  image(skyImage, 0, 0, width, height)
   bird.show()
   bird.update()
   if(pipes.length > 0){
@@ -46,8 +51,8 @@ function draw() {
       bird.hitPipe(pipe);
 
       if(pipe.x1 === 202){
-        dice = random(1)
-        if(dice < 0.8){
+        dice = floor(random(10)) + 1;
+        if(dice <= 7){
           pushPipe = true;
         }else{
           pushPipeSequence = true;
@@ -106,24 +111,24 @@ function draw() {
     }
   }
 //////////////////////////For cannonballs
-  if(dice < 0.8){
+  if(dice <= 7){
     if(pushPipe){
       pipes.push(new Pipe(random(1), Math.floor(random(60, 100)), Math.floor(random(-100, 100)), width, pipeImage1, pipeImage2));
       pushPipe = false;
     }
   }
-  else if(dice < 1){
+  else if(dice <= 10){
     if(pushPipeSequence){
       pipeSequence = new PipeSequence(pipeImage1, pipeImage2);
     }
     pushPipeSequence = false;
 
     if(pipeSequence.pipes.length === 0){
-      dice = random(1.3);
+      dice = floor(random(13)) + 1;
       canAddCount = true;
-      if(dice < 0.8){
+      if(dice <= 7){
         pushPipe = true;
-      }else if(dice < 1){
+      }else if(dice <= 10){
         pushPipeSequence = true;
       }else{
         cannonballs = new Cannonballs(5, ballImage);
@@ -132,9 +137,9 @@ function draw() {
   }
   else{
     if(cannonballs.balls.length === 0){
-      dice = random(1);
+      dice = floor(random(10)) + 1;
       canAddCount = true;
-      if(dice < 0.7){
+      if(dice <= 7){
         pushPipe = true;
       }else{
         pushPipeSequence = true;
