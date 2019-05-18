@@ -15,16 +15,42 @@ let ballImage;
 let skyImage;
 let canvas;
 
+let canvasWidth;
+let canvasHeight;
+
+
+
 function preload() {
-  birdImage = loadImage('../image/bird.png');
-  pipeImage1 = loadImage('../image/pipe.png');
-  pipeImage2 = loadImage('../image/pipe_inverse.png');
-  ballImage = loadImage('../image/ball.png')
-  skyImage = loadImage('../image/sky.jpg');
+  birdImage = loadImage('image/bird.png');
+  pipeImage1 = loadImage('image/pipe.png');
+  pipeImage2 = loadImage('image/pipe_inverse.png');
+  ballImage = loadImage('image/ball.png')
+  skyImage = loadImage('image/sky.jpg');
 }
 
 function setup() {
-  canvas = createCanvas(400, 600);
+  // canvas = createCanvas(windowWidth, windowHeight - 50);
+
+  function setWidthHeight(x){
+    if(x.matches){
+      canvasWidth = 400 + 3 * 100;
+      canvasHeight = 50;
+    }else{
+      canvasWidth = 400;
+      canvasHeight = windowHeight - 50;
+    }
+  }
+
+  let x = window.matchMedia("(max-width: 500px)")
+  setWidthHeight(x);
+  x.addListener(setWidthHeight);
+
+  console.log(canvasWidth, canvasHeight)
+
+
+
+
+  canvas = createCanvas(canvasWidth, canvasHeight);
   canvas.id('gameCanvas');
   bird = new Bird(birdImage);
   scoreItem = createP(`Score : ${bird.count}`)
