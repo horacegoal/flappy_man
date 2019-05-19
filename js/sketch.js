@@ -29,12 +29,10 @@ function preload() {
 }
 
 function setup() {
-  // canvas = createCanvas(windowWidth, windowHeight - 50);
-
   function setWidthHeight(x){
     if(x.matches){
-      canvasWidth = 400 + 3 * 100;
-      canvasHeight = 50;
+      canvasWidth = window.innerWidth;
+      canvasHeight = window.innerHeight - 50;
     }else{
       canvasWidth = 400;
       canvasHeight = windowHeight - 50;
@@ -44,11 +42,6 @@ function setup() {
   let x = window.matchMedia("(max-width: 500px)")
   setWidthHeight(x);
   x.addListener(setWidthHeight);
-
-  console.log(canvasWidth, canvasHeight)
-
-
-
 
   canvas = createCanvas(canvasWidth, canvasHeight);
   canvas.id('gameCanvas');
