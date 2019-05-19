@@ -1,4 +1,4 @@
-function Pipe(ran, gap, offSet, x ,img1, img2){
+function Pipe(ran, gap, offSet, x ,img1, img2, canDice){
   this.gap = gap;
   this.offSet = offSet;
   this.offScreen = false;
@@ -6,6 +6,7 @@ function Pipe(ran, gap, offSet, x ,img1, img2){
   this.img1 = img1;
   this.img2 = img2;
   this.canAddCount = true;
+  this.canDice = true;
   this.x1 = x;
 
   this.y1 = 0;

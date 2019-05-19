@@ -69,14 +69,18 @@ function draw() {
       pipe.move(pipe.ran);
       bird.hitPipe(pipe);
 
-      if(pipe.x1 === 202){
-        dice = floor(random(10)) + 1;
-        if(dice <= 7){
-          pushPipe = true;
-        }else{
-          pushPipeSequence = true;
+      if(pipe.canDice){
+        if(pipe.x1 < canvasWidth/2){
+          pipe.canDice = false;
+          dice = floor(random(10)) + 1;
+          if(dice <= 7){
+            pushPipe = true;
+          }else{
+            pushPipeSequence = true;
+          }
         }
       }
+
 
       if(bird.addCountForPipe(pipe)){
         scoreItem.html(`Score : ${bird.count}`)
