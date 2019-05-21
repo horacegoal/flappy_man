@@ -14,9 +14,11 @@ let pipeImage2;
 let ballImage;
 let skyImage;
 let canvas;
+let canReset = false;
 
 let canvasWidth;
 let canvasHeight;
+
 
 
 
@@ -29,6 +31,7 @@ function preload() {
 }
 
 function setup() {
+
   function setWidthHeight(x){
     if(x.matches){
       canvasWidth = window.innerWidth;
@@ -45,9 +48,20 @@ function setup() {
 
   canvas = createCanvas(canvasWidth, canvasHeight);
   canvas.id('gameCanvas');
+  scoreItem = createP(`Score : 0`)
+  resetSketch();
+
+  noLoop();
+}
+
+function resetSketch(){
+  canReset = false;
   bird = new Bird(birdImage);
-  scoreItem = createP(`Score : ${bird.count}`)
+  bird.count = 0;
+  scoreItem.html(`Score : ${bird.count}`)
   pipes = [];
+  pipeSequence = null;
+  cannonballs = null;
   dice = floor(random(10)) + 1;
   if(dice <= 7){
     pushPipe = true;
@@ -57,133 +71,149 @@ function setup() {
 }
 
 function draw() {
-  // noFill()
-  // background(220);
-  image(skyImage, 0, 0, width, height  )
+
+
+  image(skyImage, 0, 0, width, height)
+  if(!start){
+    fill(255)
+    textAlign(CENTER);
+    textSize(20)
+    text("Tap To Start", canvasWidth/2, canvasHeight/2)
+  }
+
   bird.show()
   bird.update()
-  if(pipes.length > 0){
-    pipes.forEach(function(pipe){
-      pipe.show();
-      pipe.update();
-      pipe.move(pipe.ran);
-      bird.hitPipe(pipe);
 
-      if(pipe.canDice){
-        if(pipe.x1 < canvasWidth/2){
-          pipe.canDice = false;
-          dice = floor(random(10)) + 1;
-          if(dice <= 7){
-            pushPipe = true;
-          }else{
-            pushPipeSequence = true;
+    if(pipes.length > 0){
+      pipes.forEach(function(pipe){
+        pipe.show();
+        pipe.update();
+        pipe.move(pipe.ran);
+        bird.hitPipe(pipe);
+
+        if(pipe.canDice){
+          if(pipe.x1 < canvasWidth/2){
+            pipe.canDice = false;
+            dice = floor(random(10)) + 1;
+            if(dice <= 7){
+              pushPipe = true;
+            }else{
+              pushPipeSequence = true;
+            }
+          }
+        }
+
+
+        if(bird.addCountForPipe(pipe)){
+          scoreItem.html(`Score : ${bird.count}`)
+        }
+      })
+
+      for(let i = pipes.length - 1; i >= 0; i--){
+        if(pipes[i].offScreen){
+          pipes.splice(i, 1);
+        }
+      }
+    }
+  ///////////////////////////////////For Pipe
+    if(pipeSequence){
+      if(pipeSequence.pipes.length > 0){
+        pipeSequence.show();
+        pipeSequence.update();
+
+        for(let i = pipeSequence.pipes.length - 1; i >= 0; i--){
+            if(bird.addCountForPipe(pipeSequence.pipes[i])){
+              scoreItem.html(`Score : ${bird.count}`)
+          }
+          if(pipeSequence.pipes[i].offScreen){
+            pipeSequence.pipes.splice(i , 1);
+          }
+          if(pipeSequence.pipes[i]){
+            bird.hitPipe(pipeSequence.pipes[i])
           }
         }
       }
-
-
-      if(bird.addCountForPipe(pipe)){
-        scoreItem.html(`Score : ${bird.count}`)
-      }
-    })
-
-    for(let i = pipes.length - 1; i >= 0; i--){
-      if(pipes[i].offScreen){
-        pipes.splice(i, 1);
-      }
     }
-  }
-///////////////////////////////////For Pipe
-  if(pipeSequence){
-    if(pipeSequence.pipes.length > 0){
-      pipeSequence.show();
-      pipeSequence.update();
+  //////////////////////////For PipeSequence
+    if(cannonballs){
+      if(cannonballs.balls.length > 0){
+        cannonballs.show()
+        cannonballs.update()
 
-      for(let i = pipeSequence.pipes.length - 1; i >= 0; i--){
-          if(bird.addCountForPipe(pipeSequence.pipes[i])){
+        for(let i = cannonballs.balls.length - 1; i >= 0; i--){
+          bird.hitBall(cannonballs.balls[i]);
+          if(cannonballs.balls[i].offScreen){
+            cannonballs.balls.splice(i , 1);
+          }
+        }
+
+        if(canAddCount){
+          if(bird.addCountForBall(cannonballs.balls[0])){
             scoreItem.html(`Score : ${bird.count}`)
-        }
-        if(pipeSequence.pipes[i].offScreen){
-          pipeSequence.pipes.splice(i , 1);
-        }
-        if(pipeSequence.pipes[i]){
-          bird.hitPipe(pipeSequence.pipes[i])
+            canAddCount = false;
+          }
         }
       }
     }
-  }
-//////////////////////////For PipeSequence
-  if(cannonballs){
-    if(cannonballs.balls.length > 0){
-      cannonballs.show()
-      cannonballs.update()
+  //////////////////////////For cannonballs
+    if(dice <= 7){
+      if(pushPipe){
+        pipes.push(new Pipe(random(1), Math.floor(random(60, 100)), Math.floor(random(-100, 100)), width, pipeImage1, pipeImage2));
+        pushPipe = false;
+      }
+    }
+    else if(dice <= 10){
+      if(pushPipeSequence){
+        pipeSequence = new PipeSequence(pipeImage1, pipeImage2);
+      }
+      pushPipeSequence = false;
 
-      for(let i = cannonballs.balls.length - 1; i >= 0; i--){
-        bird.hitBall(cannonballs.balls[i]);
-        if(cannonballs.balls[i].offScreen){
-          cannonballs.balls.splice(i , 1);
+      if(pipeSequence.pipes.length === 0){
+        dice = floor(random(13)) + 1;
+        canAddCount = true;
+        if(dice <= 7){
+          pushPipe = true;
+        }else if(dice <= 10){
+          pushPipeSequence = true;
+        }else{
+          cannonballs = new Cannonballs(8, ballImage);
         }
       }
-
-      if(canAddCount){
-        if(bird.addCountForBall(cannonballs.balls[0])){
-          scoreItem.html(`Score : ${bird.count}`)
-          canAddCount = false;
+    }
+    else{
+      if(cannonballs.balls.length === 0){
+        dice = floor(random(10)) + 1;
+        canAddCount = true;
+        if(dice <= 7){
+          pushPipe = true;
+        }else{
+          pushPipeSequence = true;
         }
       }
     }
-  }
-//////////////////////////For cannonballs
-  if(dice <= 7){
-    if(pushPipe){
-      pipes.push(new Pipe(random(1), Math.floor(random(60, 100)), Math.floor(random(-100, 100)), width, pipeImage1, pipeImage2));
-      pushPipe = false;
-    }
-  }
-  else if(dice <= 10){
-    if(pushPipeSequence){
-      pipeSequence = new PipeSequence(pipeImage1, pipeImage2);
-    }
-    pushPipeSequence = false;
 
-    if(pipeSequence.pipes.length === 0){
-      dice = floor(random(13)) + 1;
-      canAddCount = true;
-      if(dice <= 7){
-        pushPipe = true;
-      }else if(dice <= 10){
-        pushPipeSequence = true;
-      }else{
-        cannonballs = new Cannonballs(5, ballImage);
-      }
-    }
-  }
-  else{
-    if(cannonballs.balls.length === 0){
-      dice = floor(random(10)) + 1;
-      canAddCount = true;
-      if(dice <= 7){
-        pushPipe = true;
-      }else{
-        pushPipeSequence = true;
-      }
-    }
-  }
 }
-
-
-
-
-
-
+let start = false;
 function keyPressed(){
-  if(key = ' '){
+  if(!start){
+    loop();
+    start = true;
+  }else if(canReset){
+    resetSketch();
+    loop();
+  }else{
     bird.lift();
   }
 }
 
 function mousePressed(){
-  if(key = ' '){
+  if(!start){
+    loop();
+    start = true;
+  }else if(canReset){
+    resetSketch();
+    loop();
+  }else{
     bird.lift();
   }
 }

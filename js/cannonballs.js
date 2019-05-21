@@ -46,7 +46,7 @@ function Cannonball(y, img){
 
   this.update = function(){
     this.x -= 5;
-    if(this.x < 0 - this.r * 2){
+    if(this.x < 0 - this.r * 4){
       this.offScreen = true;
     }
   }

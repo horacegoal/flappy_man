@@ -1,4 +1,5 @@
 function Bird(img){
+  this.die = false;
   this.img = img;
   this.y = 0;
   this.d = 20;
@@ -27,12 +28,13 @@ function Bird(img){
     if(this.y < 0){
       this.y = 0;
       this.velocity = 0;
-      noLoop();
+      this.reset();
     }
     if(this.y > height){
       this.y = height;
       this.velocity = 0;
-      noLoop()
+      this.reset();
+
     }
   }
 
@@ -44,9 +46,7 @@ function Bird(img){
     let r = this.d/2
     if(this.x + this.r >= pipe.x1 && this.x - this.r <= pipe.x1 + pipe.w1){
       if(this.y <= pipe.h1 || this.y >= pipe.y2){
-        noLoop()
-
-
+        this.reset();
       }
     }
   }
@@ -55,7 +55,7 @@ function Bird(img){
     let distance = this.r + ball.r;
     let actualDist = dist(this.x,this.y,ball.x,ball.y)
     if(actualDist < distance){
-      noLoop();
+      this.reset();
     }
   }
 
@@ -77,5 +77,14 @@ function Bird(img){
       }
     }
 
+  }
+
+  this.reset = function(){
+    fill(0)
+    noLoop()
+    setTimeout(function(){
+      canReset = true;
+      text("Tap to Restart", canvasWidth/2, canvasHeight/2)
+    }, 1000)
   }
 }
